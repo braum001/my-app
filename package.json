@@ -10,6 +10,8 @@
     "@testing-library/user-event": "^7.2.1",
     "@typescript-eslint/eslint-plugin": "^2.10.0",
     "@typescript-eslint/parser": "^2.10.0",
+    "ant": "^0.2.0",
+    "antd": "^4.3.1",
     "babel-eslint": "10.1.0",
     "babel-jest": "^24.9.0",
     "babel-loader": "8.1.0",
@@ -135,5 +137,11 @@
     "presets": [
       "react-app"
     ]
+  },
+  "devDependencies": {
+    "babel-plugin-import": "^1.13.0",
+    "node-sass": "^4.14.1",
+    "sass-loader": "^8.0.2",
+    "sass-resources-loader": "^2.0.3"
   }
 }

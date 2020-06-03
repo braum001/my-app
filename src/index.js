@@ -1,18 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
-
-// class Square extends React.Component{
-//   render(){
-//     return(
-//       <button className="square">
-//         {/* TODO */}
-//       </button>
-//     )
-//   }
-// }
 
 ReactDOM.render(
   <React.StrictMode>
