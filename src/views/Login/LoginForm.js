@@ -1,12 +1,22 @@
 import React, { Component, Fragment } from 'react';
-import { Form, Input, Button, Row, Col } from 'antd';
+import { Form, Input, Button, Row, Col, message } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import { Login } from "../../api/account"
+import { Login, GetCode } from "../../api/account";
+// import { validata_email } from "../../utils/validata";
+
+//获取验证码按钮样式
+const getCodeStyle = {width: "100%"};
+
 class LoginForm extends Component {
     constructor() {
         super();
-        this.state = {};
+        this.state = {
+            username: "",
+            code_button_loading: false,
+            code_button_text: "获取验证码"
+        };
     }
+    //登录
     onFinish = values => {
         Login().then(response => {
             console.log(response);
@@ -15,10 +25,48 @@ class LoginForm extends Component {
         })
         console.log('Received values of form: ', values);
     };
+
+    //获取验证码
+    getCode = () => {
+        if (!this.state.username) {
+            message.warning('请输入用户名', 1);
+            return false;
+        } else {
+            this.setState({
+                code_button_loading: true,
+                code_button_text: "发送中"
+            })
+            setTimeout(() => {
+                this.setState({
+                    code_button_loading: false,
+                    code_button_text: "重新获取"
+                })
+            }, 10000)
+        }
+        const loginData = {
+            username: this.state.username,
+            module: "login"
+        }
+        GetCode(loginData).then(response => {
+            console.log(response);
+        }).catch(error => {
+            console.log(error);
+        })
+    };
+    inputChange = (e) => {
+        let val = e.target.value;
+        console.log(val);
+        this.setState({
+            username: val
+        })
+    }
+
+    //注册
     toRegister = () => {
         this.props.switchForm('register')
     }
     render() {
+        const { code_button_loading, code_button_text } = this.state;
         return (
             <Fragment>
                 <div className="form-header">
@@ -36,10 +84,25 @@ class LoginForm extends Component {
                             name="username"
                             rules={[
                                 { required: true, message: '用户名不能为空' },
-                                { type: "email", message: "用户名格式为邮箱" }
+                                { type: "email", message: "用户名必须为邮箱" }
+                                // ({ getFieldValue }) => ({
+                                //     validator(rule, value) {
+                                //         if (validata_email(value)) {
+                                //             that.setState({
+                                //                 code_button_disabled: false
+                                //             })
+                                //             return Promise.resolve();
+                                //         }else{
+                                //             that.setState({
+                                //                 code_button_disabled: true
+                                //             })
+                                //             return Promise.reject("用户名格式错误");
+                                //         }
+                                //     },
+                                // }),
                             ]}
                         >
-                            <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Username" />
+                            <Input onChange={this.inputChange} prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Username" />
                         </Form.Item>
                         <Form.Item
                             name="password"
@@ -59,12 +122,12 @@ class LoginForm extends Component {
                             { len: 6, message: '请输入长度为6的验证码' }
                             ]}
                         >
-                            <Row gutter={16}>
+                            <Row gutter={13}>
                                 <Col className="gutter-row" span={15}>
                                     <Input placeholder="Code" />
                                 </Col>
                                 <Col className="gutter-row" span={9}>
-                                    <Button type="primary" danger>获取验证码</Button>
+                                    <Button style={getCodeStyle} loading={code_button_loading} disabled={code_button_loading} type="primary" danger onClick={this.getCode}>{code_button_text}</Button>
                                 </Col>
                             </Row>
                         </Form.Item>

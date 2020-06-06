@@ -2,9 +2,9 @@ import axios from 'axios';
 
 //创建实例
 const service = axios.create({
-    baseURL: 'devApi',
-    timeout: 1000,
-    headers: { 'X-Custom-Header': 'foobar' }
+    baseURL: process.env.REACT_APP_BASE_URL,
+    timeout: 5000,
+    headers: {'Content-Type': 'application/x-www-form-urlencoded'}
 });
 
 // 添加请求拦截器
