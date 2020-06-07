@@ -5,7 +5,7 @@ import { Login, GetCode } from "../../api/account";
 // import { validata_email } from "../../utils/validata";
 
 //获取验证码按钮样式
-const getCodeStyle = {width: "100%"};
+const getCodeStyle = { width: "100%" };
 
 class LoginForm extends Component {
     constructor() {
@@ -13,6 +13,7 @@ class LoginForm extends Component {
         this.state = {
             username: "",
             code_button_loading: false,
+            code_button_disabled: false,
             code_button_text: "获取验证码"
         };
     }
@@ -32,16 +33,13 @@ class LoginForm extends Component {
             message.warning('请输入用户名', 1);
             return false;
         } else {
-            this.setState({
-                code_button_loading: true,
-                code_button_text: "发送中"
-            })
             setTimeout(() => {
                 this.setState({
-                    code_button_loading: false,
-                    code_button_text: "重新获取"
+                    code_button_loading: true,
+                    code_button_disabled: true,
+                    code_button_text: "发送中"
                 })
-            }, 10000)
+            }, 500)
         }
         const loginData = {
             username: this.state.username,
@@ -49,6 +47,7 @@ class LoginForm extends Component {
         }
         GetCode(loginData).then(response => {
             console.log(response);
+            this.countDown()
         }).catch(error => {
             console.log(error);
         })
@@ -61,12 +60,39 @@ class LoginForm extends Component {
         })
     }
 
+    /** 倒计时 */
+    countDown = () => {
+        let timer = null;
+        let sec = 60;
+        setTimeout(() => {
+            timer = setInterval(() => {
+                sec--;
+                this.setState({
+                    code_button_text: `${sec}S`
+                })
+                if (sec === 0) {
+                    this.setState({
+                        code_button_disabled: false,
+                        code_button_text: "重新获取"
+                    })
+                    clearInterval(timer);
+                    return false;
+                }
+            }, 1000);
+            this.setState({
+                code_button_loading: false,
+                code_button_disabled: true,
+                code_button_text: `${sec}S`
+            })
+        }, 2000)
+    }
+
     //注册
     toRegister = () => {
         this.props.switchForm('register')
     }
     render() {
-        const { code_button_loading, code_button_text } = this.state;
+        const { code_button_loading, code_button_text, code_button_disabled } = this.state;
         return (
             <Fragment>
                 <div className="form-header">
@@ -127,7 +153,7 @@ class LoginForm extends Component {
                                     <Input placeholder="Code" />
                                 </Col>
                                 <Col className="gutter-row" span={9}>
-                                    <Button style={getCodeStyle} loading={code_button_loading} disabled={code_button_loading} type="primary" danger onClick={this.getCode}>{code_button_text}</Button>
+                                    <Button style={getCodeStyle} loading={code_button_loading} disabled={code_button_disabled} type="primary" danger onClick={this.getCode}>{code_button_text}</Button>
                                 </Col>
                             </Row>
                         </Form.Item>
